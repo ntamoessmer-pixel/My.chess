@@ -3,97 +3,228 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CleanChess - Profil & Schach</title>
+  <title>Chess Master - Profil, Lektionen & Multiplayer</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-    body { background-color: #0f172a; color: white; padding: 20px; text-align: center; }
-    
-    /* Profil Bereich */
-    .profile-card {
-      background: #1e293b; border: 1px solid #334155; padding: 15px;
-      border-radius: 10px; max-width: 400px; margin: 0 auto 20px auto;
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --text: #f8fafc;
+      --border: #334155;
     }
-    .profile-card input {
-      width: 80%; padding: 8px; margin: 5px 0; background: #0f172a;
-      border: 1px solid #334155; color: white; border-radius: 5px;
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    
+    /* Navigation */
+    header {
+      width: 100%; background: var(--card-bg); border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; flex-wrap: wrap;
+    }
+    .logo { font-size: 1.4rem; font-weight: bold; color: var(--accent); }
+    nav { display: flex; gap: 10px; margin-top: 5px; }
+    nav button {
+      background: transparent; border: 1px solid var(--border); color: var(--text);
+      padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600;
+    }
+    nav button.active, nav button:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+
+    /* Container für die Seiten */
+    main { width: 100%; max-width: 800px; padding: 20px; }
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+
+    /* Karten-Style */
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+    h2 { margin-bottom: 15px; color: var(--accent); }
+
+    /* Forms & Buttons */
+    input, select {
+      width: 100%; padding: 10px; margin-bottom: 10px; background: var(--bg);
+      border: 1px solid var(--border); color: white; border-radius: 5px;
     }
     .btn {
-      background: #38bdf8; color: black; border: none; padding: 8px 15px;
-      font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 5px;
+      background: var(--accent); color: #000; border: none; padding: 10px 18px;
+      font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s;
     }
-    
+    .btn:hover { background: var(--accent-hover); color: white; }
+
     /* Schachbrett */
+    #board-container { display: flex; flex-direction: column; align-items: center; }
     #board {
       display: grid; grid-template-columns: repeat(8, 1fr);
-      width: 100%; max-width: 360px; height: 360px; margin: 0 auto;
-      border: 3px solid #334155; border-radius: 5px; overflow: hidden;
+      width: 100%; max-width: 400px; aspect-ratio: 1;
+      border: 3px solid var(--border); border-radius: 6px; overflow: hidden;
     }
     .sq {
       display: flex; align-items: center; justify-content: center;
-      font-size: 25px; cursor: pointer; user-select: none;
+      font-size: 2.3rem; cursor: pointer; user-select: none;
     }
-    .light { background-color: #e2e8f0; color: black; }
-    .dark { background-color: #475569; color: white; }
+    .light { background-color: #cbd5e1; color: #000; }
+    .dark { background-color: #475569; color: #fff; }
     .selected { background-color: #f59e0b !important; }
 
-    /* Spielliste */
-    .friends { margin-top: 20px; font-size: 14px; color: #94a3b8; }
+    /* Lektionen */
+    .lesson-item {
+      border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 10px;
+      display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);
+    }
+
+    /* Freunde & Lobby */
+    .friend-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px; border-bottom: 1px solid var(--border);
+    }
   </style>
 </head>
 <body>
 
-  <!-- PROFIL & REGISTRIERUNG -->
-  <div class="profile-card" id="auth-box">
-    <h3>Profil erstellen</h3>
-    <input type="text" id="uname" placeholder="Benutzername"><br>
-    <input type="email" id="uemail" placeholder="E-Mail"><br>
-    <input type="password" id="upass" placeholder="Passwort"><br>
-    <button class="btn" onclick="saveProfile()">Speichern & Spielen</button>
-  </div>
+  <!-- HEADER NAVIGATION -->
+  <header>
+    <div class="logo">♟️ Chess Master</div>
+    <nav>
+      <button class="nav-btn active" onclick="switchTab('game')">🎮 Schach</button>
+      <button class="nav-btn" onclick="switchTab('profile')">👤 Profil</button>
+      <button class="nav-btn" onclick="switchTab('lessons')">🎓 Lektionen</button>
+      <button class="nav-btn" onclick="switchTab('friends')">👥 Freunde</button>
+    </nav>
+  </header>
 
-  <div class="profile-card" id="user-box" style="display:none;">
-    <h3>👤 Profil: <span id="p-name"></span></h3>
-    <p>🔥 Streak: <span id="p-streak">1</span> Tag(e)</p>
-    <button class="btn" onclick="logout()" style="background:#ef4444; color:white;">Abmelden</button>
-  </div>
+  <main>
+    <!-- TAB 1: SCHACHSPIEL -->
+    <section id="tab-game" class="page-section active">
+      <div class="card" id="board-container">
+        <h3 id="game-status" style="margin-bottom: 10px;">Weiß ist am Zug</h3>
+        <div id="board"></div>
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+          <button class="btn" onclick="initBoard()">🔄 Neu Starten</button>
+          <button class="btn" style="background:#10b981; color:white;" onclick="alert('Einladungskoode kopiert! Sende ihn deinem Freund.')">🔗 Freund einladen</button>
+        </div>
+      </div>
+    </section>
 
-  <!-- SCHACHBRETT -->
-  <h2>CleanChess</h2>
-  <p id="status" style="margin: 10px 0; color: #38bdf8;">Weiß ist am Zug</p>
-  
-  <div id="board"></div>
+    <!-- TAB 2: PROFIL -->
+    <section id="tab-profile" class="page-section">
+      <div class="card">
+        <h2>Mein Profil</h2>
+        <div style="display:flex; align-items:center; gap:20px; margin-bottom: 15px;">
+          <div style="font-size: 3rem;">👤</div>
+          <div>
+            <h3 id="prof-name-display">Gast</h3>
+            <p style="color:#94a3b8;" id="prof-email-display">Nicht registriert</p>
+            <p style="color:#f59e0b; font-weight:bold; margin-top:5px;" id="prof-streak">🔥 1 Tage Streak</p>
+          </div>
+        </div>
+        <hr style="border-color:var(--border); margin: 15px 0;">
+        <h4>Profil-Einstellungen ändern</h4>
+        <input type="text" id="prof-input-name" placeholder="Neuer Benutzername" style="margin-top:10px;">
+        <input type="email" id="prof-input-email" placeholder="E-Mail Adresse">
+        <button class="btn" onclick="saveProfile()">Profil Speichern</button>
+      </div>
+    </section>
 
-  <br>
-  <button class="btn" onclick="initGame()">🔄 Spiel Neu Starten</button>
+    <!-- TAB 3: LEKTIONEN -->
+    <section id="tab-lessons" class="page-section">
+      <div class="card">
+        <h2>Schach-Lektionen</h2>
+        <p style="color:#94a3b8; margin-bottom: 15px;">Lerne die wichtigsten Taktiken und Regeln:</p>
 
-  <div class="friends">
-    <p><strong>Freunde online:</strong> MasterChess (🔥 5 Tage), Player123 (🔥 2 Tage)</p>
-  </div>
+        <div class="lesson-item">
+          <div>
+            <strong>Lektion 1: Die Grundzüge der Figuren</strong>
+            <p style="font-size:0.85rem; color:#94a3b8;">Wie bewegen sich Turm, Springer und Läufer?</p>
+          </div>
+          <button class="btn" onclick="startLesson(1)">Starten</button>
+        </div>
+
+        <div class="lesson-item">
+          <div>
+            <strong>Lektion 2: Das Schäfermatt</strong>
+            <p style="font-size:0.85rem; color:#94a3b8;">Setze deinen Gegner in nur 4 Zügen matt.</p>
+          </div>
+          <button class="btn" onclick="startLesson(2)">Starten</button>
+        </div>
+
+        <div class="lesson-item">
+          <div>
+            <strong>Lektion 3: Rochade & En Passant</strong>
+            <p style="font-size:0.85rem; color:#94a3b8;">Fortgeschrittene Sonderregeln im Schach.</p>
+          </div>
+          <button class="btn" onclick="startLesson(3)">Starten</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: FREUNDE & MULTIPLAYER -->
+    <section id="tab-friends" class="page-section">
+      <div class="card">
+        <h2>Freunde & Herausforderungen</h2>
+        <p style="color:#94a3b8; margin-bottom: 15px;">Spiele gegen Freunde oder lade Spieler ein:</p>
+        
+        <div class="friend-item">
+          <div><strong>Magnus_Fan</strong> (🔥 5 Tage)</div>
+          <button class="btn" onclick="challengeFriend('Magnus_Fan')">Herausfordern</button>
+        </div>
+
+        <div class="friend-item">
+          <div><strong>SchachMaster2026</strong> (🔥 12 Tage)</div>
+          <button class="btn" onclick="challengeFriend('SchachMaster2026')">Herausfordern</button>
+        </div>
+
+        <div class="friend-item">
+          <div><strong>QueenGambit</strong> (🔥 3 Tage)</div>
+          <button class="btn" onclick="challengeFriend('QueenGambit')">Herausfordern</button>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <script>
-    // Profil Logik
+    // Tab Wechsel System
+    function switchTab(tabName) {
+      document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById('tab-' + tabName).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // Profil System
     function saveProfile() {
-      const name = document.getElementById('uname').value;
-      if (!name) return alert('Bitte Namen eingeben!');
-      localStorage.setItem('chess_user', name);
-      showProfile(name);
+      const name = document.getElementById('prof-input-name').value;
+      const email = document.getElementById('prof-input-email').value;
+      
+      if(name) localStorage.setItem('chess_username', name);
+      if(email) localStorage.setItem('chess_useremail', email);
+      
+      loadProfile();
+      alert('Profil erfolgreich gespeichert!');
     }
 
-    function showProfile(name) {
-      document.getElementById('auth-box').style.display = 'none';
-      document.getElementById('user-box').style.display = 'block';
-      document.getElementById('p-name').innerText = name;
+    function loadProfile() {
+      const name = localStorage.getItem('chess_username') || 'Spieler123';
+      const email = localStorage.getItem('chess_useremail') || 'spieler@beispiel.de';
+      
+      document.getElementById('prof-name-display').innerText = name;
+      document.getElementById('prof-email-display').innerText = email;
+      document.getElementById('prof-input-name').value = name;
+      document.getElementById('prof-input-email').value = email;
     }
 
-    function logout() {
-      localStorage.removeItem('chess_user');
-      location.reload();
+    // Lektionen System
+    function startLesson(id) {
+      if(id === 1) alert("Lektion 1: Der Turm bewegt sich gerade (horizontal/vertikal). Der Läufer zieht diagonal. Der Springer springt in L-Form!");
+      if(id === 2) alert("Lektion 2: Ziehe den Königsbauern e2-e4, greife mit der Dame f3 und dem Läufer c4 das Feld f7 an!");
+      if(id === 3) alert("Lektion 3: Die Rochade schützt deinen König und bringt den Turm ins Spiel. Sie geht nur, wenn beide noch nicht gezogen wurden!");
     }
 
-    const savedUser = localStorage.getItem('chess_user');
-    if (savedUser) showProfile(savedUser);
+    // Multiplayer / Freunde
+    function challengeFriend(name) {
+      alert(`Herausforderung an ${name} verschickt! Wenn dein Freund zustimmt, startet das Spiel.`);
+      switchTab('game');
+    }
 
-    // Schach Logik
+    // Schach-Brett Logik
     const startPieces = [
       ['♜','♞','♝','♛','♚','♝','♞','♜'],
       ['♟','♟','♟','♟','♟','♟','♟','♟'],
@@ -108,14 +239,14 @@
     let grid = [];
     let sel = null;
 
-    function initGame() {
+    function initBoard() {
       grid = JSON.parse(JSON.stringify(startPieces));
       sel = null;
-      document.getElementById('status').innerText = "Weiß ist am Zug";
-      draw();
+      document.getElementById('game-status').innerText = "Weiß ist am Zug";
+      renderBoard();
     }
 
-    function draw() {
+    function renderBoard() {
       const b = document.getElementById('board');
       b.innerHTML = '';
       for (let r = 0; r < 8; r++) {
@@ -124,28 +255,28 @@
           d.className = `sq ${(r + c) % 2 === 0 ? 'light' : 'dark'}`;
           if (sel && sel.r === r && sel.c === c) d.classList.add('selected');
           d.innerText = grid[r][c];
-          d.onclick = () => clickSq(r, c);
+          d.onclick = () => onSquareClick(r, c);
           b.appendChild(d);
         }
       }
     }
 
-    function clickSq(r, c) {
+    function onSquareClick(r, c) {
       if (sel) {
-        // Figur bewegen
         grid[r][c] = grid[sel.r][sel.c];
         grid[sel.r][sel.c] = '';
         sel = null;
       } else {
-        // Figur auswählen
         if (grid[r][c] !== '') {
           sel = { r, c };
         }
       }
-      draw();
+      renderBoard();
     }
 
-    initGame();
+    // Start-Initialisierung
+    loadProfile();
+    initBoard();
   </script>
 </body>
 </html>
