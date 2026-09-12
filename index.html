@@ -3,325 +3,149 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CleanChess - Online Schach</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>CleanChess - Profil & Schach</title>
   <style>
-    :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --accent: #38bdf8;
-      --accent-hover: #0284c7;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --border: #334155;
-      --board-light: #e2e8f0;
-      --board-dark: #475569;
-      --square-selected: #f59e0b;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
-
-    header {
-      background: var(--card-bg); border-bottom: 1px solid var(--border);
-      padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;
-    }
-
-    .logo { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
-    .streak-badge { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid #f59e0b; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 600; font-size: 0.85rem; }
-
-    #auth-screen {
-      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95);
-      display: flex; justify-content: center; align-items: center; z-index: 100;
-    }
-
-    .auth-card {
-      background: var(--card-bg); border: 1px solid var(--border); padding: 2rem;
-      border-radius: 12px; width: 90%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    }
-    .auth-card h2 { margin-bottom: 1.2rem; text-align: center; }
-    .form-group { margin-bottom: 1rem; }
-    .form-group label { display: block; margin-bottom: 0.3rem; font-size: 0.85rem; color: var(--text-muted); }
-    .form-group input { width: 100%; padding: 0.65rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: white; }
-
-    .btn {
-      width: 100%; padding: 0.65rem; background: var(--accent); color: #000;
-      border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 0.5rem;
-    }
-    .btn:hover { background: var(--accent-hover); color: white; }
-    .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
-    .btn-secondary:hover { background: var(--border); }
-
-    main {
-      display: grid; grid-template-columns: 1fr 320px; gap: 2rem;
-      padding: 2rem; max-width: 1100px; margin: 0 auto; width: 100%; flex: 1;
-    }
-    @media (max-width: 850px) { main { grid-template-columns: 1fr; } }
-
-    .game-container { display: flex; flex-direction: column; align-items: center; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background-color: #0f172a; color: white; padding: 20px; text-align: center; }
     
-    /* Schachbrett CSS Grid */
-    #chessboard {
-      width: 100%; max-width: 480px; aspect-ratio: 1;
-      display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
-      border-radius: 8px; overflow: hidden; border: 4px solid var(--border);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5); user-select: none;
+    /* Profil Bereich */
+    .profile-card {
+      background: #1e293b; border: 1px solid #334155; padding: 15px;
+      border-radius: 10px; max-width: 400px; margin: 0 auto 20px auto;
     }
-
-    .square {
-      display: flex; justify-content: center; align-items: center;
-      font-size: 2.8rem; cursor: pointer; transition: background 0.1s;
+    .profile-card input {
+      width: 80%; padding: 8px; margin: 5px 0; background: #0f172a;
+      border: 1px solid #334155; color: white; border-radius: 5px;
     }
-    @media (max-width: 500px) { .square { font-size: 2rem; } }
-    .square.light { background-color: var(--board-light); color: #1e293b; }
-    .square.dark { background-color: var(--board-dark); color: #f8fafc; }
-    .square.selected { background-color: var(--square-selected) !important; }
-
-    .game-controls { margin-top: 1.2rem; display: flex; gap: 0.8rem; width: 100%; max-width: 480px; }
-
-    .sidebar {
-      background: var(--card-bg); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1.2rem; display: flex; flex-direction: column; gap: 1.2rem; height: fit-content;
+    .btn {
+      background: #38bdf8; color: black; border: none; padding: 8px 15px;
+      font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 5px;
     }
-    .sidebar h3 { font-size: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
-    .user-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
-    .user-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: rgba(255,255,255,0.03); border-radius: 6px; }
+    
+    /* Schachbrett */
+    #board {
+      display: grid; grid-template-columns: repeat(8, 1fr);
+      width: 100%; max-width: 360px; height: 360px; margin: 0 auto;
+      border: 3px solid #334155; border-radius: 5px; overflow: hidden;
+    }
+    .sq {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 25px; cursor: pointer; user-select: none;
+    }
+    .light { background-color: #e2e8f0; color: black; }
+    .dark { background-color: #475569; color: white; }
+    .selected { background-color: #f59e0b !important; }
 
-    .hidden { display: none !important; }
+    /* Spielliste */
+    .friends { margin-top: 20px; font-size: 14px; color: #94a3b8; }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="logo">♟️ CleanChess</div>
-    <div class="user-info hidden" id="user-info" style="display:flex; align-items:center; gap:1rem;">
-      <span class="streak-badge" id="streak-display">🔥 0 Tage</span>
-      <span id="player-name" style="font-weight:600;"></span>
-      <button onclick="logout()" class="btn btn-secondary" style="width:auto; padding:0.3rem 0.6rem; font-size:0.8rem;">Logout</button>
-    </div>
-  </header>
-
-  <!-- Registrierung / Login -->
-  <div id="auth-screen">
-    <div class="auth-card">
-      <h2>Willkommen bei CleanChess</h2>
-      <form id="auth-form">
-        <div class="form-group">
-          <label>Benutzername</label>
-          <input type="text" id="username" required placeholder="z.B. ChessPro">
-        </div>
-        <div class="form-group">
-          <label>E-Mail-Adresse</label>
-          <input type="email" id="email" required placeholder="deine@email.de">
-        </div>
-        <div class="form-group">
-          <label>Passwort</label>
-          <input type="password" id="password" required placeholder="••••••••">
-        </div>
-        <button type="submit" class="btn">Konto erstellen & Spielen</button>
-      </form>
-    </div>
+  <!-- PROFIL & REGISTRIERUNG -->
+  <div class="profile-card" id="auth-box">
+    <h3>Profil erstellen</h3>
+    <input type="text" id="uname" placeholder="Benutzername"><br>
+    <input type="email" id="uemail" placeholder="E-Mail"><br>
+    <input type="password" id="upass" placeholder="Passwort"><br>
+    <button class="btn" onclick="saveProfile()">Speichern & Spielen</button>
   </div>
 
-  <main>
-    <div class="game-container">
-      <div id="chessboard"></div>
-      <div class="game-controls">
-        <button class="btn" onclick="toggleBot()">🤖 Gegen KI spielen</button>
-        <button class="btn btn-secondary" onclick="resetBoard()">🔄 Neu starten</button>
-      </div>
-    </div>
+  <div class="profile-card" id="user-box" style="display:none;">
+    <h3>👤 Profil: <span id="p-name"></span></h3>
+    <p>🔥 Streak: <span id="p-streak">1</span> Tag(e)</p>
+    <button class="btn" onclick="logout()" style="background:#ef4444; color:white;">Abmelden</button>
+  </div>
 
-    <aside class="sidebar">
-      <div>
-        <h3>🌍 Spieler & Freunde</h3>
-        <ul class="user-list" id="user-list" style="margin-top:0.8rem;"></ul>
-      </div>
-      <div>
-        <h3>📊 Status</h3>
-        <p id="status-text" style="color:var(--text-muted); font-size:0.9rem; margin-top:0.5rem;">Weiß ist am Zug.</p>
-      </div>
-    </aside>
-  </main>
+  <!-- SCHACHBRETT -->
+  <h2>CleanChess</h2>
+  <p id="status" style="margin: 10px 0; color: #38bdf8;">Weiß ist am Zug</p>
+  
+  <div id="board"></div>
+
+  <br>
+  <button class="btn" onclick="initGame()">🔄 Spiel Neu Starten</button>
+
+  <div class="friends">
+    <p><strong>Freunde online:</strong> MasterChess (🔥 5 Tage), Player123 (🔥 2 Tage)</p>
+  </div>
 
   <script>
-    // Unicode-Figuren
-    const PIECES = {
-      'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟',
-      'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'
-    };
+    // Profil Logik
+    function saveProfile() {
+      const name = document.getElementById('uname').value;
+      if (!name) return alert('Bitte Namen eingeben!');
+      localStorage.setItem('chess_user', name);
+      showProfile(name);
+    }
 
-    let boardState = [
-      ['r','n','b','q','k','b','n','r'],
-      ['p','p','p','p','p','p','p','p'],
-      ['','','','','','','',''],
-      ['','','','','','','',''],
-      ['','','','','','','',''],
-      ['','','','','','','',''],
-      ['P','P','P','P','P','P','P','P'],
-      ['R','N','B','Q','K','B','N','R']
-    ];
-
-    let selectedSquare = null;
-    let turn = 'W'; // 'W' = Weiß, 'B' = Schwarz
-    let vsBot = false;
-
-    const mockUsers = [
-      { name: "Magnus_Fan", streak: 5 },
-      { name: "SchachKönig", streak: 12 },
-      { name: "QueenGambit", streak: 3 }
-    ];
-
-    // Auth
-    document.getElementById('auth-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const user = { name: document.getElementById('username').value, streak: 1 };
-      localStorage.setItem('cleanChess_user', JSON.stringify(user));
-      loadUser();
-    });
-
-    function loadUser() {
-      const stored = localStorage.getItem('cleanChess_user');
-      if(stored) {
-        const user = JSON.parse(stored);
-        document.getElementById('auth-screen').classList.add('hidden');
-        document.getElementById('user-info').classList.remove('hidden');
-        document.getElementById('player-name').innerText = user.name;
-        document.getElementById('streak-display').innerText = `🔥 ${user.streak} Tage Streak`;
-      }
+    function showProfile(name) {
+      document.getElementById('auth-box').style.display = 'none';
+      document.getElementById('user-box').style.display = 'block';
+      document.getElementById('p-name').innerText = name;
     }
 
     function logout() {
-      localStorage.removeItem('cleanChess_user');
+      localStorage.removeItem('chess_user');
       location.reload();
     }
 
-    // Brett Rendering
-    function renderBoard() {
-      const boardEl = document.getElementById('chessboard');
-      boardEl.innerHTML = '';
+    const savedUser = localStorage.getItem('chess_user');
+    if (savedUser) showProfile(savedUser);
 
-      for(let r = 0; r < 8; r++) {
-        for(let c = 0; c < 8; c++) {
-          const sq = document.createElement('div');
-          sq.className = `square ${(r + c) % 2 === 0 ? 'light' : 'dark'}`;
-          sq.dataset.row = r;
-          sq.dataset.col = c;
-          
-          if (selectedSquare && selectedSquare.r === r && selectedSquare.c === c) {
-            sq.classList.add('selected');
-          }
+    // Schach Logik
+    const startPieces = [
+      ['♜','♞','♝','♛','♚','♝','♞','♜'],
+      ['♟','♟','♟','♟','♟','♟','♟','♟'],
+      ['','','','','','','',''],
+      ['','','','','','','',''],
+      ['','','','','','','',''],
+      ['','','','','','','',''],
+      ['♙','♙','♙','♙','♙','♙','♙','♙'],
+      ['♖','♘','♗','♕','♔','♗','♘','♖']
+    ];
 
-          const piece = boardState[r][c];
-          if(piece) sq.innerText = PIECES[piece];
+    let grid = [];
+    let sel = null;
 
-          sq.addEventListener('click', () => handleSquareClick(r, c));
-          boardEl.appendChild(sq);
+    function initGame() {
+      grid = JSON.parse(JSON.stringify(startPieces));
+      sel = null;
+      document.getElementById('status').innerText = "Weiß ist am Zug";
+      draw();
+    }
+
+    function draw() {
+      const b = document.getElementById('board');
+      b.innerHTML = '';
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          const d = document.createElement('div');
+          d.className = `sq ${(r + c) % 2 === 0 ? 'light' : 'dark'}`;
+          if (sel && sel.r === r && sel.c === c) d.classList.add('selected');
+          d.innerText = grid[r][c];
+          d.onclick = () => clickSq(r, c);
+          b.appendChild(d);
         }
       }
     }
 
-    function isWhitePiece(p) { return p && p === p.toUpperCase(); }
-    function isBlackPiece(p) { return p && p === p.toLowerCase(); }
-
-    function handleSquareClick(r, c) {
-      const piece = boardState[r][c];
-
-      if (selectedSquare) {
-        // Zug ausführen
-        if (selectedSquare.r === r && selectedSquare.c === c) {
-          selectedSquare = null; // Deselect
-        } else {
-          makeMove(selectedSquare.r, selectedSquare.c, r, c);
-          selectedSquare = null;
-        }
+    function clickSq(r, c) {
+      if (sel) {
+        // Figur bewegen
+        grid[r][c] = grid[sel.r][sel.c];
+        grid[sel.r][sel.c] = '';
+        sel = null;
       } else {
         // Figur auswählen
-        if (turn === 'W' && isWhitePiece(piece)) {
-          selectedSquare = { r, c };
-        } else if (turn === 'B' && !vsBot && isBlackPiece(piece)) {
-          selectedSquare = { r, c };
+        if (grid[r][c] !== '') {
+          sel = { r, c };
         }
       }
-      renderBoard();
+      draw();
     }
 
-    function makeMove(fromR, fromC, toR, toC) {
-      const p = boardState[fromR][fromC];
-      boardState[toR][toC] = p;
-      boardState[fromR][fromC] = '';
-      
-      turn = (turn === 'W') ? 'B' : 'W';
-      document.getElementById('status-text').innerText = turn === 'W' ? 'Weiß ist am Zug.' : 'Schwarz ist am Zug.';
-
-      renderBoard();
-
-      // KI Antwort wenn aktiviert
-      if (vsBot && turn === 'B') {
-        setTimeout(makeBotMove, 400);
-      }
-    }
-
-    function makeBotMove() {
-      const blackMoves = [];
-      for(let r=0; r<8; r++) {
-        for(let c=0; c<8; c++) {
-          if(isBlackPiece(boardState[r][c])) {
-            // Einfache Züge nach vorne/unten simulieren
-            if(r < 7 && boardState[r+1][c] === '') blackMoves.push({from: {r,c}, to: {r: r+1, c}});
-          }
-        }
-      }
-
-      if(blackMoves.length > 0) {
-        const move = blackMoves[Math.floor(Math.random() * blackMoves.length)];
-        makeMove(move.from.r, move.from.c, move.to.r, move.to.c);
-      } else {
-        turn = 'W';
-        document.getElementById('status-text').innerText = 'Weiß ist am Zug.';
-      }
-    }
-
-    function toggleBot() {
-      vsBot = true;
-      resetBoard();
-      document.getElementById('status-text').innerText = 'Spiel gegen KI gestartet! Du spielst Weiß.';
-    }
-
-    function resetBoard() {
-      boardState = [
-        ['r','n','b','q','k','b','n','r'],
-        ['p','p','p','p','p','p','p','p'],
-        ['','','','','','','',''],
-        ['','','','','','','',''],
-        ['','','','','','','',''],
-        ['','','','','','','',''],
-        ['P','P','P','P','P','P','P','P'],
-        ['R','N','B','Q','K','B','N','R']
-      ];
-      turn = 'W';
-      selectedSquare = null;
-      renderBoard();
-    }
-
-    function renderUserList() {
-      const list = document.getElementById('user-list');
-      list.innerHTML = '';
-      mockUsers.forEach(u => {
-        const li = document.createElement('li');
-        li.className = 'user-item';
-        li.innerHTML = `
-          <div><strong>${u.name}</strong><br><small style="color:var(--text-muted)">🔥 ${u.streak} Streak</small></div>
-          <button class="btn" style="width:auto; padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="alert('Einladung an ${u.name} gesendet!')">Einladen</button>
-        `;
-        list.appendChild(li);
-      });
-    }
-
-    // Init
-    loadUser();
-    renderBoard();
-    renderUserList();
+    initGame();
   </script>
 </body>
 </html>
