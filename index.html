@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CleanChess - Online Schach</title>
+  <title>CleanChess - Game & Owner Panel</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -15,46 +15,87 @@
       --border: #334155;
       --green: #10b981;
       --gold: #f59e0b;
+      --danger: #ef4444;
+      --glow-purple: #a855f7;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 70px; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; transition: background 0.2s, border-color 0.2s; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 75px; }
     
-    /* Top Header */
+    /* GLOW DESIGN THEME */
+    body.theme-glow {
+      --accent: #c084fc;
+      --border: #a855f7;
+      background-color: #0b0314;
+    }
+    body.theme-glow header {
+      border-bottom: 2px solid #c084fc;
+      box-shadow: 0 0 25px #a855f7, inset 0 -5px 15px rgba(168, 85, 247, 0.4);
+    }
+    body.theme-glow .card, body.theme-glow .menu-card, body.theme-glow .modal-content, body.theme-glow .owner-box {
+      border-color: #c084fc !important;
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+    }
+    body.theme-glow .btn { box-shadow: 0 0 12px #a855f7; }
+    body.theme-glow #board { border: 3px solid #c084fc !important; box-shadow: 0 0 30px #a855f7; }
+    body.theme-glow .sq { text-shadow: 0 0 10px #c084fc, 0 0 20px #a855f7; }
+    body.theme-glow .glow-bar-top { display: block !important; }
+
+    .glow-bar-top {
+      display: none; height: 6px; width: 100%;
+      background: linear-gradient(90deg, #d8b4fe, #a855f7, #6b21a8, #a855f7, #d8b4fe);
+      box-shadow: 0 0 20px #a855f7, 0 0 40px #a855f7;
+    }
+
+    /* Header */
     header {
       background: var(--card-bg); border-bottom: 1px solid var(--border);
-      padding: 1rem; text-align: center; font-size: 1.3rem; font-weight: bold; color: var(--accent);
+      padding: 0.8rem 1rem; display: flex; justify-content: space-between; align-items: center; font-size: 1.2rem; font-weight: bold; color: var(--accent);
     }
+    .aura-box { display: flex; align-items: center; gap: 6px; }
+    .aura-display { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--gold); color: var(--gold); padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; }
+    .btn-aura-plus {
+      background: var(--gold); color: #000; border: none; font-weight: bold;
+      width: 26px; height: 26px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .btn-aura-plus:hover { transform: scale(1.1); }
 
     /* Hauptbereich & Seiten */
     main { width: 100%; max-width: 600px; margin: 0 auto; padding: 15px; }
     .page { display: none; }
     .page.active { display: block; }
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 15px; }
     
-    /* Buttons & Menü-Kacheln */
-    .menu-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 15px; }
+    /* Startseite Layout */
+    .hero-banner { text-align: center; padding: 25px 15px; background: linear-gradient(180deg, rgba(56, 189, 248, 0.1) 0%, rgba(0,0,0,0) 100%); border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
+    .bottom-menu-container { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+    
     .menu-card {
       background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 15px;
-      display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: 0.2s;
+      display: flex; align-items: center; justify-content: space-between; cursor: pointer;
     }
     .menu-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .menu-card-title { font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+    .menu-card-title { font-weight: bold; font-size: 1.05rem; display: flex; align-items: center; gap: 10px; }
 
     .btn {
       background: var(--accent); color: #000; border: none; padding: 10px 16px;
-      font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; transition: 0.2s; margin-top: 8px;
+      font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 8px;
     }
-    .btn:hover { background: var(--accent-hover); color: white; }
     .btn-green { background: var(--green); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
     .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
 
-    /* Modal / Popup für KI-Schwierigkeit */
+    /* Owner Panel Box */
+    .owner-box { background: rgba(168, 85, 247, 0.08); border: 1px dashed var(--glow-purple); border-radius: 10px; padding: 15px; margin-top: 15px; }
+    .owner-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+
+    /* Modal / Popups */
     .modal {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
       display: none; justify-content: center; align-items: center; z-index: 100; padding: 20px;
     }
     .modal.active { display: flex; }
-    .modal-content { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; width: 100%; max-width: 350px; text-align: center; }
+    .modal-content { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; width: 100%; max-width: 380px; text-align: center; }
 
     /* Schachbrett */
     #board-container { display: flex; flex-direction: column; align-items: center; gap: 12px; }
@@ -68,7 +109,7 @@
     .dark { background-color: #475569; color: #fff; }
     .selected { background-color: var(--gold) !important; }
 
-    /* Untere Menüleiste (Bottom Nav) */
+    /* Untere Navigation */
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
       background: var(--card-bg); border-top: 1px solid var(--border);
@@ -81,29 +122,44 @@
     .nav-item .icon { font-size: 1.3rem; }
     .nav-item.active { color: var(--accent); }
 
-    /* Shop (Platzhalter) */
-    .empty-shop { text-align: center; padding: 30px 10px; color: var(--text-muted); }
+    .shop-item {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 15px;
+      display: flex; justify-content: space-between; align-items: center; margin-top: 10px;
+    }
   </style>
 </head>
 <body>
 
-  <header>♟️ CleanChess</header>
+  <div class="glow-bar-top"></div>
+
+  <!-- HEADER MIT AURA-BUTTON -->
+  <header>
+    <span>♟️ CleanChess</span>
+    <div class="aura-box">
+      <span class="aura-display">✨ <span id="aura-val">0</span> Aura</span>
+      <button class="btn-aura-plus" onclick="showPage('shop', document.querySelectorAll('.nav-item')[3])" title="Mehr Aura im Shop">+</button>
+    </div>
+  </header>
 
   <main>
-    <!-- PAGE 1: START (HAUPTMENÜ) -->
+    <!-- PAGE 1: STARTSEITE -->
     <section id="page-start" class="page active">
+      <div class="hero-banner">
+        <h2>CleanChess Studio</h2>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin-top:5px;">Spiele gegen die KI oder absolviere Lektionen!</p>
+      </div>
+
+      <!-- MENÜS UNTEN AUF DER STARTSEITE -->
       <div class="card">
-        <h2>Willkommen zurück!</h2>
-        <p style="color:var(--text-muted); font-size:0.9rem;">Wähle einen Spielmodus oder lerne neue Taktiken:</p>
-        
-        <div class="menu-grid">
-          <div class="menu-card" onclick="openDifficultyModal()">
+        <h3>Schnellstart-Menü</h3>
+        <div class="bottom-menu-container">
+          <div class="menu-card" onclick="openModal('ai-modal')">
             <div class="menu-card-title">🤖 Gegen KI spielen</div>
             <span>➔</span>
           </div>
           
-          <div class="menu-card" onclick="alert('Lektion 1: Der Turm zieht gerade, der Läufer zieht diagonal!')">
-            <div class="menu-card-title">🎓 Lektionen</div>
+          <div class="menu-card" onclick="openModal('lesson-modal')">
+            <div class="menu-card-title">🎓 Lektionen (Level <span id="start-lvl-display">1</span>)</div>
             <span>➔</span>
           </div>
 
@@ -115,33 +171,53 @@
       </div>
     </section>
 
-    <!-- PAGE 2: SCHACHSPIEL BRETT -->
+    <!-- PAGE 2: SCHACHSPIEL -->
     <section id="page-game" class="page">
       <div class="card" id="board-container">
         <div style="display:flex; justify-content:space-between; width:100%; max-width:380px; font-size:0.9rem;">
           <span id="turn-info">Weiß am Zug</span>
-          <span id="ai-level-info" style="color:var(--accent); font-weight:bold;">KI: Normal</span>
+          <span id="mode-info" style="color:var(--accent); font-weight:bold;">KI: Mittel</span>
         </div>
 
         <div id="board"></div>
 
-        <button class="btn btn-outline" onclick="showPage('start')">↩️ Zurück zum Hauptmenü</button>
+        <button class="btn btn-outline" onclick="showPage('start')">↩️ Spiel Beenden / Zurück</button>
       </div>
     </section>
 
-    <!-- PAGE 3: PROFIL -->
+    <!-- PAGE 3: PROFIL & OWNER PANEL -->
     <section id="page-profile" class="page">
       <div class="card">
         <h2>👤 Mein Profil</h2>
         <div style="margin: 15px 0;">
-          <h3 id="prof-name">Spieler123</h3>
-          <p style="color:var(--gold); margin-top:5px;">🔥 1 Tag Streak</p>
+          <h3 id="prof-name">SchachPro</h3>
+          <p style="color:var(--gold); margin-top:5px;">✨ <span id="prof-aura">0</span> Aura | 🔥 <span id="prof-streak">1</span> Tage Streak</p>
+          <p style="color:var(--accent); font-size:0.9rem; margin-top:3px;">🎓 Lektions-Level: <span id="prof-level">1</span></p>
         </div>
         <hr style="border-color:var(--border); margin:15px 0;">
-        <h4>Erfolge</h4>
-        <div style="margin-top:10px; font-size:0.9rem; color:var(--text-muted);">
-          <p>✅ <strong>Erster Schritt:</strong> Profil erstellt</p>
-          <p>🔒 <strong>KI-Bezwinger:</strong> Gewinne gegen die KI (Schwer)</p>
+        <h4>Aktiver Look:</h4>
+        <p id="active-skin-name" style="color:var(--accent); font-weight:bold; margin-top:5px;">Standard Dark</p>
+      </div>
+
+      <!-- EINSTELLUNGEN & OWNER PANEL -->
+      <div class="card">
+        <h2>⚙️ Einstellungen & Owner-Panel</h2>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:10px;">Verwalte deine Entwickler-Einstellungen:</p>
+        
+        <button class="btn btn-outline" style="border-color:var(--glow-purple); color:var(--glow-purple);" onclick="toggleOwnerPanel()">👑 Owner-Panel freischalten</button>
+
+        <div class="owner-box" id="owner-panel" style="display:none;">
+          <h4 style="color:var(--glow-purple);">👑 Owner-Steuerung (Admin)</h4>
+          <p style="font-size:0.75rem; color:var(--text-muted);">Passwort verifiziert!</p>
+          
+          <div class="owner-grid">
+            <button class="btn btn-green" onclick="adminAddAura(500)">+500 Aura</button>
+            <button class="btn btn-danger" onclick="adminAddAura(-500)">-500 Aura</button>
+            <button class="btn" onclick="adminSetStreak()">🔥 Streak ändern</button>
+            <button class="btn" onclick="adminSetLevel()">🎓 Level ändern</button>
+            <button class="btn" style="background:var(--glow-purple); color:white;" onclick="adminUnlockGlow()">👑 Glow Gratis</button>
+            <button class="btn btn-danger" onclick="adminResetAll()">🔄 Alles Resetten</button>
+          </div>
         </div>
       </div>
     </section>
@@ -149,28 +225,33 @@
     <!-- PAGE 4: MISSIONEN -->
     <section id="page-missions" class="page">
       <div class="card">
-        <h2>📜 Tägliche Missionen</h2>
+        <h2>🎯 Wie verdiene ich Aura?</h2>
         <div style="display:flex; flex-direction:column; gap:10px; margin-top:15px;">
-          <div style="background:var(--bg); padding:10px; border-radius:8px; border:1px solid var(--border);">
-            <strong>Spiele 1 Partie gegen die KI</strong>
-            <p style="font-size:0.8rem; color:var(--text-muted);">Belohnung: 50 Münzen</p>
+          <div style="background:var(--bg); padding:12px; border-radius:8px; border:1px solid var(--border);">
+            <strong>🎓 Richtige Lektion abschließen</strong>
+            <p style="font-size:0.85rem; color:var(--gold); margin-top:4px;">+40 Aura Belohnung</p>
           </div>
-          <div style="background:var(--bg); padding:10px; border-radius:8px; border:1px solid var(--border);">
-            <strong>Schließe 1 Lektion ab</strong>
-            <p style="font-size:0.8rem; color:var(--text-muted);">Belohnung: 🔥 +1 Streak</p>
+          <div style="background:var(--bg); padding:12px; border-radius:8px; border:1px solid var(--border);">
+            <strong>♟️ Schachspiel beenden</strong>
+            <p style="font-size:0.85rem; color:var(--gold); margin-top:4px;">+150 Aura Belohnung</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- PAGE 5: SHOP (LEER) -->
+    <!-- PAGE 5: SHOP -->
     <section id="page-shop" class="page">
       <div class="card">
         <h2>🛍️ Shop</h2>
-        <div class="empty-shop">
-          <div style="font-size:3rem; margin-bottom:10px;">📦</div>
-          <h3>Der Shop ist noch leer</h3>
-          <p>Bald kannst du hier neue Schachbrett-Designs freischalten!</p>
+        <p style="color:var(--text-muted); font-size:0.85rem;">Schalte exklusive Designs mit deiner Aura frei!</p>
+
+        <div class="shop-item">
+          <div>
+            <strong style="color:#c084fc;">🌌 Glow-Design (Lila)</strong>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Lila Leuchtbalken & Neonglow Ränder!</p>
+            <p style="font-size:0.85rem; color:var(--gold); font-weight:bold; margin-top:3px;">Preis: 500 Aura</p>
+          </div>
+          <button class="btn" id="btn-buy-glow" style="width:auto; padding:8px 14px;" onclick="buyGlowTheme()">Kaufen</button>
         </div>
       </div>
     </section>
@@ -180,12 +261,8 @@
       <div class="card">
         <h2>🏆 Rangliste</h2>
         <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
-          <div style="display:flex; justify-content:space-between; padding:8px; background:var(--bg); border-radius:6px;">
-            <span>#1 Grandmaster</span>
-            <button class="btn btn-outline" style="width:auto; padding:2px 8px; font-size:0.75rem;" onclick="alert('Freund hinzugefügt!')">➕ Adden</button>
-          </div>
-          <div style="display:flex; justify-content:space-between; padding:8px; background:var(--bg); border-radius:6px;">
-            <span>#2 ChessKing</span>
+          <div style="display:flex; justify-content:space-between; padding:10px; background:var(--bg); border-radius:6px;">
+            <span>#1 GlowMaster (2400 Aura)</span>
             <button class="btn btn-outline" style="width:auto; padding:2px 8px; font-size:0.75rem;" onclick="alert('Freund hinzugefügt!')">➕ Adden</button>
           </div>
         </div>
@@ -194,21 +271,35 @@
     </section>
   </main>
 
-  <!-- MODAL FOR KI DIFFICULTY -->
-  <div class="modal" id="difficulty-modal">
+  <!-- MODAL FOR LEKTIONEN LEVEL -->
+  <div class="modal" id="lesson-modal">
     <div class="modal-content">
-      <h3>Schwierigkeitsgrad wählen</h3>
-      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Wähle die Stärke der KI aus:</p>
+      <h3>🎓 Lektion wählen</h3>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Gewinne +40 Aura für jede richtige Lektion!</p>
+      
+      <button class="btn btn-green" onclick="startLesson(1)">Level 1: Grundlagen (+40 Aura)</button>
+      <button class="btn" onclick="startLesson(2)">Level 2: Taktiken (+40 Aura)</button>
+      <button class="btn" style="background:#ef4444; color:white;" onclick="startLesson(3)">Level 3: Profi-Züge (+40 Aura)</button>
+      
+      <button class="btn btn-outline" onclick="closeModal('lesson-modal')" style="margin-top:10px;">Abbrechen</button>
+    </div>
+  </div>
+
+  <!-- MODAL FOR KI DIFFICULTY -->
+  <div class="modal" id="ai-modal">
+    <div class="modal-content">
+      <h3>🤖 KI-Schwierigkeit</h3>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Erhalte +150 Aura für ein absolviertes Spiel!</p>
       
       <button class="btn btn-green" onclick="startAiGame('Einfach')">🟢 Einfach</button>
       <button class="btn" onclick="startAiGame('Mittel')">🟡 Mittel</button>
       <button class="btn" style="background:#ef4444; color:white;" onclick="startAiGame('Schwer')">🔴 Schwer</button>
       
-      <button class="btn btn-outline" onclick="closeDifficultyModal()" style="margin-top:10px;">Abbrechen</button>
+      <button class="btn btn-outline" onclick="closeModal('ai-modal')" style="margin-top:10px;">Abbrechen</button>
     </div>
   </div>
 
-  <!-- BOTTOM NAVIGATION BAR -->
+  <!-- UNTERE MENÜLEISTE -->
   <div class="bottom-nav">
     <button class="nav-item active" onclick="showPage('start', this)">
       <span class="icon">🏠</span>
@@ -229,9 +320,95 @@
   </div>
 
   <script>
-    let currentAiLevel = 'Mittel';
+    // APP DATEN & LOCALSTORAGE
+    let aura = parseInt(localStorage.getItem('cc_aura')) || 0;
+    let streak = parseInt(localStorage.getItem('cc_streak')) || 1;
+    let playerLevel = parseInt(localStorage.getItem('cc_level')) || 1;
+    let hasGlow = localStorage.getItem('cc_has_glow') === 'true';
+    let activeTheme = localStorage.getItem('cc_theme') || 'default';
+    let ownerUnlocked = false;
 
-    // NAVIGATION SYSTEM
+    function updateStatsDisplay() {
+      document.getElementById('aura-val').innerText = aura;
+      document.getElementById('prof-aura').innerText = aura;
+      document.getElementById('prof-streak').innerText = streak;
+      document.getElementById('prof-level').innerText = playerLevel;
+      document.getElementById('start-lvl-display').innerText = playerLevel;
+      
+      localStorage.setItem('cc_aura', aura);
+      localStorage.setItem('cc_streak', streak);
+      localStorage.setItem('cc_level', playerLevel);
+      
+      updateShopBtn();
+    }
+
+    function addAura(amount, msg) {
+      aura += amount;
+      if (aura < 0) aura = 0;
+      updateStatsDisplay();
+      if(msg) alert(`🎉 +${amount} Aura erhalten!\n${msg}`);
+    }
+
+    // OWNER PANEL LOGIK
+    function toggleOwnerPanel() {
+      if (ownerUnlocked) {
+        const panel = document.getElementById('owner-panel');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        return;
+      }
+
+      const pw = prompt("Bitte Owner-Passwort eingeben:");
+      if (pw === "owner123") {
+        ownerUnlocked = true;
+        document.getElementById('owner-panel').style.display = 'block';
+        alert("👑 Owner-Panel erfolgreich freigeschaltet!");
+      } else if (pw !== null) {
+        alert("❌ Falsches Passwort!");
+      }
+    }
+
+    function adminAddAura(val) {
+      addAura(val);
+      alert(`Admin: Aura um ${val} geändert!`);
+    }
+
+    function adminSetStreak() {
+      const val = prompt("Neuen Streak (Tage) eingeben:", streak);
+      if (val !== null && !isNaN(val)) {
+        streak = parseInt(val);
+        updateStatsDisplay();
+        alert(`Admin: Streak auf ${streak} Tage gesetzt!`);
+      }
+    }
+
+    function adminSetLevel() {
+      const val = prompt("Neues Level eingeben:", playerLevel);
+      if (val !== null && !isNaN(val)) {
+        playerLevel = parseInt(val);
+        updateStatsDisplay();
+        alert(`Admin: Level auf ${playerLevel} gesetzt!`);
+      }
+    }
+
+    function adminUnlockGlow() {
+      hasGlow = true;
+      activeTheme = 'glow';
+      localStorage.setItem('cc_has_glow', 'true');
+      localStorage.setItem('cc_theme', 'glow');
+      document.body.classList.add('theme-glow');
+      document.getElementById('active-skin-name').innerText = '🌌 Lila Glow-Design';
+      updateStatsDisplay();
+      alert("Admin: Glow-Design gratis freigeschaltet!");
+    }
+
+    function adminResetAll() {
+      if (confirm("Wirklich deinen gesamten Fortschritt zurücksetzen?")) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    // NAVIGATION
     function showPage(pageId, navEl) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById('page-' + pageId).classList.add('active');
@@ -242,23 +419,71 @@
       }
     }
 
-    // MODAL SCHWIERIGKEITSGRAD
-    function openDifficultyModal() {
-      document.getElementById('difficulty-modal').classList.add('active');
-    }
-    function closeDifficultyModal() {
-      document.getElementById('difficulty-modal').classList.remove('active');
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    // SHOP & GLOW THEME
+    function buyGlowTheme() {
+      if (hasGlow) {
+        if (activeTheme === 'glow') {
+          activeTheme = 'default';
+          document.body.classList.remove('theme-glow');
+          document.getElementById('active-skin-name').innerText = 'Standard Dark';
+        } else {
+          activeTheme = 'glow';
+          document.body.classList.add('theme-glow');
+          document.getElementById('active-skin-name').innerText = '🌌 Lila Glow-Design';
+        }
+        localStorage.setItem('cc_theme', activeTheme);
+        updateShopBtn();
+        return;
+      }
+
+      if (aura >= 500) {
+        aura -= 500;
+        hasGlow = true;
+        activeTheme = 'glow';
+        localStorage.setItem('cc_has_glow', 'true');
+        localStorage.setItem('cc_theme', 'glow');
+        document.body.classList.add('theme-glow');
+        document.getElementById('active-skin-name').innerText = '🌌 Lila Glow-Design';
+        updateStatsDisplay();
+        alert('✨ Glow-Design gekauft und aktiviert!');
+      } else {
+        alert('❌ Du brauchst 500 Aura für dieses Design!');
+      }
     }
 
-    function startAiGame(level) {
-      currentAiLevel = level;
-      closeDifficultyModal();
-      document.getElementById('ai-level-info').innerText = 'KI: ' + level;
-      initBoard();
-      showPage('game');
+    function updateShopBtn() {
+      const btn = document.getElementById('btn-buy-glow');
+      if (hasGlow) {
+        btn.innerText = activeTheme === 'glow' ? 'Aktiviert (Klick Deaktivieren)' : 'Aktivieren';
+        btn.style.background = '#a855f7';
+        btn.style.color = '#fff';
+      } else {
+        btn.innerText = 'Für 500 Aura Kaufen';
+      }
     }
 
-    // SCHACH BRETT LOGIK
+    // LEKTIONEN
+    function startLesson(level) {
+      closeModal('lesson-modal');
+      let q = "";
+      if (level === 1) q = "Level 1: Welches Symbol zieht diagonal?\n(1) Turm\n(2) Läufer";
+      if (level === 2) q = "Level 2: Kann der Springer über andere Figuren springen?\n(1) Ja\n(2) Nein";
+      if (level === 3) q = "Level 3: Auf welchem Feld steht die weiße Dame am Start?\n(1) d1\n(2) e1";
+
+      let ans = prompt(q);
+      if ((level === 1 && ans === '2') || (level === 2 && ans === '1') || (level === 3 && ans === '1')) {
+        addAura(40, "Lektion gemeistert!");
+        if (level >= playerLevel) playerLevel = level + 1;
+        updateStatsDisplay();
+      } else {
+        alert("Leider falsch!");
+      }
+    }
+
+    // SCHACH LOGIK
     const startBoard = [
       ['♜','♞','♝','♛','♚','♝','♞','♜'],
       ['♟','♟','♟','♟','♟','♟','♟','♟'],
@@ -270,16 +495,15 @@
       ['♖','♘','♗','♕','♔','♗','♘','♖']
     ];
 
-    let grid = [];
-    let sel = null;
-    let turn = 'W';
+    let grid = [], sel = null, turn = 'W', movesCount = 0;
 
-    function initBoard() {
+    function startAiGame(level) {
+      closeModal('ai-modal');
+      document.getElementById('mode-info').innerText = 'KI: ' + level;
       grid = JSON.parse(JSON.stringify(startBoard));
-      sel = null;
-      turn = 'W';
-      document.getElementById('turn-info').innerText = 'Weiß am Zug';
+      sel = null; turn = 'W'; movesCount = 0;
       renderBoard();
+      showPage('game');
     }
 
     function renderBoard() {
@@ -303,21 +527,23 @@
           grid[r][c] = grid[sel.r][sel.c];
           grid[sel.r][sel.c] = '';
           turn = (turn === 'W') ? 'B' : 'W';
-          document.getElementById('turn-info').innerText = turn === 'W' ? 'Weiß am Zug' : 'KI denkt...';
+          movesCount++;
           sel = null;
           renderBoard();
 
+          if (movesCount === 4) {
+            addAura(150, "Schachspiel absolviert!");
+          }
+
           if (turn === 'B') {
-            setTimeout(makeAiMove, 600);
+            setTimeout(makeAiMove, 500);
           }
         } else {
-          sel = null;
-          renderBoard();
+          sel = null; renderBoard();
         }
       } else {
         if (grid[r][c] !== '') {
-          sel = { r, c };
-          renderBoard();
+          sel = { r, c }; renderBoard();
         }
       }
     }
@@ -331,20 +557,21 @@
           }
         }
       }
-
       if(blackPieces.length > 0) {
         const move = blackPieces[Math.floor(Math.random() * blackPieces.length)];
         grid[move.to.r][move.to.c] = grid[move.from.r][move.from.c];
         grid[move.from.r][move.from.c] = '';
       }
-
       turn = 'W';
-      document.getElementById('turn-info').innerText = 'Weiß am Zug';
       renderBoard();
     }
 
     // INIT
-    initBoard();
+    if (activeTheme === 'glow' && hasGlow) {
+      document.body.classList.add('theme-glow');
+      document.getElementById('active-skin-name').innerText = '🌌 Lila Glow-Design';
+    }
+    updateStatsDisplay();
   </script>
 </body>
 </html>
