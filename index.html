@@ -185,12 +185,12 @@
       </div>
     </section>
 
-    <!-- PAGE 3: PROFIL & OWNER PANEL -->
+    <!-- PAGE 3: PROFIL & OWNER PANEL (DIREKT FREIGESCHALTET) -->
     <section id="page-profile" class="page">
       <div class="card">
         <h2>👤 Mein Profil</h2>
         <div style="margin: 15px 0;">
-          <h3 id="prof-name">SchachPro</h3>
+          <h3 id="prof-name">Owner / Spieler</h3>
           <p style="color:var(--gold); margin-top:5px;">✨ <span id="prof-aura">0</span> Aura | 🔥 <span id="prof-streak">1</span> Tage Streak</p>
           <p style="color:var(--accent); font-size:0.9rem; margin-top:3px;">🎓 Lektions-Level: <span id="prof-level">1</span></p>
         </div>
@@ -202,13 +202,12 @@
       <!-- EINSTELLUNGEN & OWNER PANEL -->
       <div class="card">
         <h2>⚙️ Einstellungen & Owner-Panel</h2>
-        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:10px;">Verwalte deine Entwickler-Einstellungen:</p>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:10px;">Direkter Zugriff ohne Passwort:</p>
         
-        <button class="btn btn-outline" style="border-color:var(--glow-purple); color:var(--glow-purple);" onclick="toggleOwnerPanel()">👑 Owner-Panel freischalten</button>
+        <button class="btn btn-outline" style="border-color:var(--glow-purple); color:var(--glow-purple);" onclick="toggleOwnerPanel()">👑 Owner-Panel Umschalten</button>
 
-        <div class="owner-box" id="owner-panel" style="display:none;">
-          <h4 style="color:var(--glow-purple);">👑 Owner-Steuerung (Admin)</h4>
-          <p style="font-size:0.75rem; color:var(--text-muted);">Passwort verifiziert!</p>
+        <div class="owner-box" id="owner-panel" style="display:block;">
+          <h4 style="color:var(--glow-purple);">👑 Owner-Steuerung</h4>
           
           <div class="owner-grid">
             <button class="btn btn-green" onclick="adminAddAura(500)">+500 Aura</button>
@@ -299,7 +298,7 @@
     </div>
   </div>
 
-  <!-- UNTERE MENÜLEISTE -->
+  <!-- UNTERE NAVIGATIONSLEISTE -->
   <div class="bottom-nav">
     <button class="nav-item active" onclick="showPage('start', this)">
       <span class="icon">🏠</span>
@@ -320,13 +319,12 @@
   </div>
 
   <script>
-    // APP DATEN & LOCALSTORAGE
+    // LOCALSTORAGE & SYSTEM
     let aura = parseInt(localStorage.getItem('cc_aura')) || 0;
     let streak = parseInt(localStorage.getItem('cc_streak')) || 1;
     let playerLevel = parseInt(localStorage.getItem('cc_level')) || 1;
     let hasGlow = localStorage.getItem('cc_has_glow') === 'true';
     let activeTheme = localStorage.getItem('cc_theme') || 'default';
-    let ownerUnlocked = false;
 
     function updateStatsDisplay() {
       document.getElementById('aura-val').innerText = aura;
@@ -349,27 +347,15 @@
       if(msg) alert(`🎉 +${amount} Aura erhalten!\n${msg}`);
     }
 
-    // OWNER PANEL LOGIK
+    // OWNER PANEL FUNCTIONS
     function toggleOwnerPanel() {
-      if (ownerUnlocked) {
-        const panel = document.getElementById('owner-panel');
-        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-        return;
-      }
-
-      const pw = prompt("Bitte Owner-Passwort eingeben:");
-      if (pw === "owner123") {
-        ownerUnlocked = true;
-        document.getElementById('owner-panel').style.display = 'block';
-        alert("👑 Owner-Panel erfolgreich freigeschaltet!");
-      } else if (pw !== null) {
-        alert("❌ Falsches Passwort!");
-      }
+      const panel = document.getElementById('owner-panel');
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
     }
 
     function adminAddAura(val) {
       addAura(val);
-      alert(`Admin: Aura um ${val} geändert!`);
+      alert(`Aura um ${val} geändert!`);
     }
 
     function adminSetStreak() {
@@ -377,7 +363,7 @@
       if (val !== null && !isNaN(val)) {
         streak = parseInt(val);
         updateStatsDisplay();
-        alert(`Admin: Streak auf ${streak} Tage gesetzt!`);
+        alert(`Streak auf ${streak} Tage gesetzt!`);
       }
     }
 
@@ -386,7 +372,7 @@
       if (val !== null && !isNaN(val)) {
         playerLevel = parseInt(val);
         updateStatsDisplay();
-        alert(`Admin: Level auf ${playerLevel} gesetzt!`);
+        alert(`Level auf ${playerLevel} gesetzt!`);
       }
     }
 
@@ -398,7 +384,7 @@
       document.body.classList.add('theme-glow');
       document.getElementById('active-skin-name').innerText = '🌌 Lila Glow-Design';
       updateStatsDisplay();
-      alert("Admin: Glow-Design gratis freigeschaltet!");
+      alert("Glow-Design gratis freigeschaltet!");
     }
 
     function adminResetAll() {
@@ -408,7 +394,7 @@
       }
     }
 
-    // NAVIGATION
+    // PAGES
     function showPage(pageId, navEl) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById('page-' + pageId).classList.add('active');
@@ -422,7 +408,7 @@
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-    // SHOP & GLOW THEME
+    // SHOP & SKIN
     function buyGlowTheme() {
       if (hasGlow) {
         if (activeTheme === 'glow') {
@@ -483,7 +469,7 @@
       }
     }
 
-    // SCHACH LOGIK
+    // SCHACH ENGINE
     const startBoard = [
       ['♜','♞','♝','♛','♚','♝','♞','♜'],
       ['♟','♟','♟','♟','♟','♟','♟','♟'],
